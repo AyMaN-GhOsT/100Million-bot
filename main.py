@@ -40,8 +40,13 @@ image = Image.debian_slim().pip_install_from_requirements("requirements.txt")
 stub = Stub("poe-bot-quickstart")
 
 
-@stub.function(image=image)
-@asgi_app()
-def fastapi_app():
-    app = make_app(bot, allow_without_key=True)
-    return app
+from fastapi_poe import PoeBot, run
+
+class EchoBot(PoeBot):
+    async def get_response(self, query):
+        last_message = query.query[-1].content
+        yield self.text_event(last_message)
+
+if __name__ == "__main__":
+    run(EchoBot())
+
